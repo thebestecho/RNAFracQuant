@@ -1,0 +1,18 @@
+# Samplesheet.txtx
+# Sample descriptions and filenames for Tota, 100,000g Sup and Pellet
+# Experiment by Edward Wallace, ewjwallace@gmail.com, November 2018
+# counts on ORFs quantified by HTSeq.
+#
+Condition	Fraction	File	Sample
+30C	Tot	DAD-80.txt	30C_T
+30C	Sup	DAD-81.txt	30C_S
+30C	P100	DAD-82.txt	30C_P
+42C	Tot	DAD-83.txt	42C_T
+42C	Sup	DAD-84.txt	42C_S
+42C	P100	DAD-85.txt	42C_P
+46C	Tot	DAD-86.txt	46C_T
+46C	Sup	DAD-87.txt	46C_S
+46C	P100	DAD-88.txt	46C_P
+42CR	Tot	DAD-89.txt	42CR_T
+42CR	Sup	DAD-90.txt	42CR_S
+42CR	P100	DAD-91.txt	42CR_P
