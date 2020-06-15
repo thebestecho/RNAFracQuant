@@ -4,8 +4,14 @@ author: "Edward Wallace"
 date: "26th September 2017"
 output:
   html_document:
-    toc: true
+    toc: yes
     toc_depth: 4
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+  word_document:
+    toc: yes
+    toc_depth: '4'
 ---
 
 
@@ -19,7 +25,7 @@ Outputs for select (verified) ORFs:
 ```{r setup,warning=FALSE,message=FALSE,echo=FALSE}
 
 ## knitr options for report generation
-knitr::opts_chunk$set(warning=FALSE,message=FALSE,echo=TRUE,cache=FALSE,
+knitr::opts_chunk$set(warning=FALSE,message=FALSE,echo=TRUE,cache=FALSE, # original cache=FALSE
                       results="show",
                       fig.path="figure/quantFromCounts-",
                       cache.path="cache/quantFromCounts-")
@@ -128,8 +134,8 @@ txtheader <-
 ```{r load_data}
 # setwd("~/Repos/RNAFracQuant/script_initial/")
 Samplesheet <- read_tsv("../data_in/TSP_count/Samplesheet.txt",comment="#")
-ORFselect <- read_tsv("../data_in/orf_coding_EW_select.txt")
-dir_processed <- "../data_processed/TSP_count"
+ORFselect <- read_tsv("../data_in/orf_coding_EW_select.txt") # reference for calculation
+dir_processed <- "../data_processed/"
 
 read_ORFCount <- function(file_ext,dir_in) {
     # Convenience function for reading data in given format
@@ -149,15 +155,16 @@ TSP_Count <- Samplesheet %>%
 TSP_Count_TPM <- TSP_Count %>%
     inner_join(ORFselect) %>%
     group_by(Sample,Condition,Fraction) %>%
-    mutate(Density=Count/Length, 
+    mutate(Density=Count/Length, # count/length stands for??? 
            TPM=Density/sum(Density)*1e6  ) %>%
     select(Sample,Condition,Fraction,ORF,Count,TPM)
 
 TSP_Count_TPM
-# # check TPM sums to 1mi.
+# # check TPM sums to 1e6.
 TSP_Count_TPM %>%
     summarize(Count=sum(Count),TPM=sum(TPM))
 
+# Firstly, insert the text header into the file
 cat(txtheader,
 "# TSP_Count_TPM_tidy.txt
 # TSP measurements, RNA Counts and TPM
@@ -165,8 +172,9 @@ cat(txtheader,
 # 
 ",
     file=paste0(dir_processed,"TSP_Count_TPM_tidy.txt"),sep="")
+# Then write the file
 write_tsv(TSP_Count_TPM %>%
-              mutate(TPM=round(TPM,1)),
+              mutate(TPM=round(TPM,1)), # keep one decimal place
           paste0(dir_processed,"TSP_Count_TPM_tidy.txt"),
           append=TRUE,col_names=TRUE)
 ```
@@ -193,7 +201,7 @@ cat(txtheader,
 write_tsv(TSP_Count_TPM %>%
               ungroup() %>%
               select(Condition,Fraction,ORF,TPM) %>%
-              mutate(TPM=round(TPM,1)) %>%
+              mutate(TPM=round(TPM,1)) %>% # keep one decimal place
               spread(Fraction,TPM),
           paste0(dir_processed,"TSP_TPM_halfwide.txt"),
           append=TRUE,col_names=TRUE)
@@ -232,6 +240,7 @@ write_tsv(TSP_Count_TPM %>%
 
 ```{r mixingratiosTSP_stan}
 
+# get initial data for stan fit
 mdat_mixingTSP <- function(ctdata) {
     ## make data for stan fit
     head(ctdata)
@@ -243,6 +252,7 @@ mdat_mixingTSP <- function(ctdata) {
     
 }
 
+# compile model
 make_mixingTSP <- function(ctdata) {
     stan_dat <- mdat_mixingTSP(ctdata)
     stan(model_code='// -*- mode: C -*-
@@ -288,6 +298,7 @@ generated quantities{
 data=stan_dat,chains = 1,iter = 10)
 }
 
+# pass data to stan and run model
 fit_mixingTSP <- function(ctdata,stan_mixing=NULL,...) {
     stan_dat <- mdat_mixingTSP(ctdata)
     if (is.null(stan_mixing)) {
@@ -318,8 +329,9 @@ Filter by median tpm > 5, min tpm > 0, across all conditions.
 
 This is to remove low-abundance transcripts, where the counts aren't informative anyway, and reduce the time to fit.
 
-```{r fitmixingratiosTSP,dependson=c("TSP_wide","mixingratiosTSP_stan")}
-
+```{r fitmixingratiosTSP,dependson=c("TSP_wide","mixingratiosTSP_stan"),include=FALSE}
+# add include=FALSE, not print outputs
+# get names of low-abundance ORFs
 wd5_TSP_Tot <- 
     TSP_Count_TPM %>%
     filter(Fraction=="Tot") %>%
@@ -327,7 +339,7 @@ wd5_TSP_Tot <-
     summarise(d5 = sum(TPM > 5),wd5=(d5==4)) %>%
     filter(wd5) %>%
     .$ORF
-
+# remove them
 TSP_Count_FracBySample <- 
     TSP_Count_TPM %>%
     ungroup() %>%
@@ -485,4 +497,69 @@ ggplot(data=TSP_Count_FracBySample_pSup,aes(x=Tot,y=mixSum)) +
 
 
 The mixSum correlation shows that the re-fitting works very well.
+
+# Added parts; update: 14th June 2020
+## Estimated parameters
+```{r printparas,dependson="fitmixingratiosTSP",echo=TRUE}
+# print estimated parameters
+pander::pander(mixing_ratios_TSP)
+```
+
+
+## Graphical diagnosis of model
+```{r echo=TRUE}
+# graphical diagonosis of model
+library(shinystan)
+shiny <- launch_shinystan(stan_mixingTSP_wd5)
+shiny
+```
+## Model tests results
+### Distribution of known Hsp genes
+```{r modeltestTSP,dependson="calcpSupetcTSP",fig.height=2.5,fig.width=7.5,echo=TRUE}
+# import the known HSp genes with their respective ORFs
+pander::pander(Hsp)
+
+# filter
+Hsp_pSup <- 
+  TSP_Count_FracBySample_pSup%>%
+  filter(ORF %in% Hsp$ORF)%>%
+  select(Condition,ORF,pSup)
+
+# plot
+ggplot(data=Hsp_pSup,aes(x = Condition, y = pSup, group=4))+
+  geom_line(stat = "identity",colour="#000099")+
+  geom_point(size=3,colour="#CC0000")+
+  facet_wrap(~ORF,ncol=3)+
+  ggtitle("Distribution of Hsp genes (Hsp26,Hsp30,Hsp12)")
+
+```
+### Distribution of a list of genes
+```{r modeltestTSP2,dependson="calcpSupetcTSP",fig.height=6.4,fig.width=12.5,echo=TRUE}
+# import the genes list with their respective ORFs
+pander::pander(test_genes)
+
+# filter
+test_genepSup <- 
+  TSP_Count_FracBySample_pSup%>%
+  filter(ORF %in% test_genes$ORF)%>%
+  select(Condition,ORF,pSup)
+
+# replace ORF names with gene names (??????unsolved)
+
+# plot them in different colours (glycolysis,ribosome,nucleolus,heat_sg,superaggregator)
+# glycolysis <- c("YCR012W") 
+# ribosome <- c("YOR182C")
+# nucleolus <- c("YHR089C")
+# heat_sg <- c("YER165W","YMR309C","YBR079C","YOR361C","YBR143C","YDR172W","YNL016W","YGR178C","YKL081W","YKL056C","YLR249W","YOL139C","YNL197C","YDL160C","YNL118C","YGL049C")
+# superaggregator <- c ("YOR051C","YCL011C","YBR025C","YBR227C","YCL037C","YCR051W","YDR361C","YER006W","YER164W","YML074C","YLR449W","YOL144W","YGL201C","YJR070C","YOR204W","YNL112W","YGL078C")
+# ???????????unsolved
+
+# plot the distribution
+ggplot(data=test_genepSup,aes(x = Condition, y = pSup, group=4))+
+  geom_line(stat = "identity",colour="#000099")+
+  geom_point(size=1,colour="#CC0000")+
+  facet_wrap(~ORF,ncol=7)+
+  ggtitle("Distribution of a list of genes")
+
+```
 
