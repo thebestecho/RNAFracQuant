@@ -1,0 +1,128 @@
+---
+title: "draft"
+author: "Edward's lab - MSc Xuejia KE"
+date: "28th June 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE, tidy=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Process Data
+## Get the input data directory
+```{r starter, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+# Load all the functions
+source(here::here("myfunctions.R"))
+
+# call the starter function to load all the packages
+.First() 
+
+# Ask users the name of the input directory
+# The input directory should include all the count files and Samplesheet.txt file
+dir_in=readline('Please type in the name of your input data folder: ')
+```
+
+
+## Read samplesheet
+```{r load_samplesheet, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Read Samplesheet.txt that was prepared by users from the input directory
+samplesheet <- read_samplesheet(dir_in=dir_in)
+head(samplesheet)
+```
+
+
+## Read mRNA count files
+```{r read_count_files, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Read all the count files from the input directory
+get_count <- read_count_files(dir_in=dir_in)
+head(get_count)
+```
+
+## Calculate TPM 
+```{r calculate_TPM, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Calculate TPM for each row
+count_with_TPM <- get_TPM(dir_in=dir_in)
+head(count_with_TPM)
+```
+
+## Remove low-abundance transcripts
+```{r get_ORF_list, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Get the ORF list with high TPM from the data 
+admissible_ORF_list <- admissible_ORF(dir_in=dir_in)
+head(admissible_ORF_list)
+```
+
+## Tidy data
+```{r get_tidydata, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Filter data using the ORF list generated above to get tidy data
+tidydata <- get_tidy_data(dir_in=dir_in)
+head(tidydata)
+```
+
+# Model fitting & get mean of the parameters
+```{r model_fitting, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Compile model, code is saved in file model.stan
+compile_model <- stan_model(here::here("model.stan"))
+
+# Get the median of each estimated parameter for each condition
+# Tot = mixing.Sup * Sup + mixing.P100 * Pellet
+# Generate a data frame
+paras_mean = plyr::ddply(tidydata, ~Condition, get_para_sta)
+print("The mean values of estimated parameters are shown below: ")
+print(paras_mean)
+```
+
+# Output
+## Calculate pSup
+```{r calculate_pSup, dependson = c("get_tidydata", "model_fitting")}
+# pSup indicates the proportion of the mRNA in supernatant
+tidydata_pSup <- tidydata %>%
+    dplyr::left_join(select(paras_mean,Condition,mixing.Sup,mixing.P100)) %>%
+    mutate(pSup=mixing.Sup*Sup/(mixing.Sup*Sup+mixing.P100*P100))
+```
+
+
+## Write the output into files
+```{r generate_output_files, dependson = "model_fitting"}
+# Create a directory named Results to store results
+dir.create(here::here("Results"))
+# Write the data frame that includes ratios in file estimated_ratios.txt
+write_tsv(paras_mean,
+          here::here("Results","estimated_ratios.txt"))
+# Write the data that includes pSup for each transcript in file PSup.txt
+write_tsv(tidydata_pSup,
+          here::here("Results","PSup.txt"))
+```
+
+
+
+# Data Visualisation
+## Graphical results representation (not complete)
+```{r}
+
+```
+
+
+## Graphical model diagnosis
+```{r shinystan, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Ask users whether they want to launch shiny for visulising model graphical diagnosis
+# Not sure if we need to specify which condition when diagnosing the model
+# It is accessible to treat the data as a whole and view the diagnosis
+while (TRUE) {
+  input = readline('Do you want to view the model diagnosis using Shiny? 
+                     \n Please type Y for yes and N for no. ')
+  if (input == "Y") {
+    model_on_condition = readline('Please type in the condition name that you would like to view: \nFor example, 30C (it should be consistent with Samplesheet.txt)')
+    library(shinystan)
+    condition_tidydata <- dplyr::filter(tidydata,Condition == model_on_condition)
+    model_fit_condition <- tidy_fit(tidydata = condition_tidydata)
+    model_diagnosis <- launch_shinystan(model_fit_condition)
+    return(model_diagnosis)
+  } else if (input == "N"){
+    return(message("OK, that's the end of the programme.\n Thanks for using it :)"))
+  } else {
+    message("Warning: ")
+  }
+}
+```
