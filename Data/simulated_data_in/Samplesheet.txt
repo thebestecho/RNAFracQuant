@@ -1,0 +1,7 @@
+Condition	Fraction	File	Sample
+30C	Tot	sample1.txt	30C_T
+30C	Sup	sample2.txt	30C_S
+30C	P100	sample3.txt	30C_P
+42C	Tot	sample4.txt	42C_T
+42C	Sup	sample5.txt	42C_S
+42C	P100	sample6.txt	42C_P
