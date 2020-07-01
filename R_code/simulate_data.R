@@ -39,6 +39,6 @@ write_tsv(sample4,
 sample5 <- data.frame(ORF, Sup2)
 write_tsv(sample5,
           here::here("simulated_data_in","sample5.txt"),col_names = FALSE)
-sample6 <- data.frame(ORF, Pellet1)
+sample6 <- data.frame(ORF, Pellet2)
 write_tsv(sample6,
           here::here("simulated_data_in","sample6.txt"),col_names = FALSE)
