@@ -66,20 +66,21 @@ head(tidydata)
 compile_model <- stan_model(here::here("model.stan"))
 
 # Get the median of each estimated parameter for each condition
-# Tot = mixing.Sup * Sup + mixing.P100 * Pellet
+# Tot = scaling.factor.Sup * Sup + scaling.factor.Pellet * Pellet
 # Generate a data frame
 paras_mean = plyr::ddply(tidydata, ~Condition, get_para_sta)
 print("The mean values of estimated parameters are shown below: ")
 print(paras_mean)
 ```
 
+
 # Output
 ## Calculate pSup
 ```{r calculate_pSup, dependson = c("get_tidydata", "model_fitting")}
 # pSup indicates the proportion of the mRNA in supernatant
 tidydata_pSup <- tidydata %>%
-    dplyr::left_join(select(paras_mean,Condition,mixing.Sup,mixing.P100)) %>%
-    mutate(pSup=mixing.Sup*Sup/(mixing.Sup*Sup+mixing.P100*P100))
+    dplyr::left_join(select(paras_mean,Condition,scaling.factor.Sup,scaling.factor.Pellet)) %>%
+    mutate(pSup=scaling.factor.Sup*Sup/(scaling.factor.Sup*Sup+scaling.factor.Pellet*Pellet))
 ```
 
 
