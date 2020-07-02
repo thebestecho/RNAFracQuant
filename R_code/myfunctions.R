@@ -28,10 +28,7 @@ read_samplesheet <- function(dir_in)
     input = readline('Are your data files from yeast?\n Please type Y for yes and N for no. ')
     if (input == "Y") {
       samplesheet = paste0(dir_in, "/Samplesheet.txt")
-      tryCatch(read_tsv(here::here(dir_in, "Samplesheet.txt"), comment = "#"), error = function(c) {
-        c$message <- paste0(" Error ",c$message, " (error in ", samplesheet, ")") # point out where the error is from
-        stop(c)
-      })
+      read_tsv(here::here(dir_in, "Samplesheet.txt"), comment = "#")
       load_samplesheet = read_tsv(here::here(dir_in, "Samplesheet.txt"), comment = "#")
       return(load_samplesheet)
     } else if (input == "N"){
@@ -70,8 +67,11 @@ read_count_files <- function(dir_in)
     } else if (typeof(count_data$Count) != "double"){
       stop("Require Count values for each ORF in all data files.")
     } else {
-      count_data = mutate(count_data,ORF = str_sub(ORF)) # Used be end = -5, need to consider this later
-      return(count_data)
+      n <- readline('Please provide the length of your ORF suffix: 
+                    \nFor example, the suffix of YAL002W_CDS is _CDS then its length is 4.')
+      read_from <- as.numeric(n)+1
+      countdata = mutate(count_data,ORF = str_sub(ORF,end = -read_from))
+      return(countdata)
     }
   }
 }
@@ -120,7 +120,7 @@ admissible_ORF <- function(dir_in){
   get_Tot <- count_with_TPM %>%
     dplyr::filter(Fraction=="Tot")
   if (nrow(get_Tot) == 0){
-    stop("Fraction Tot is not found. Please make sure your columns are listed as Tot,Sup,P100 in file Samplesheet.txt.")
+    stop("Fraction Tot is not found. Please make sure your columns are listed as Tot,Sup,Pellet in file Samplesheet.txt.")
   } else {
 # samplesheet <- read_samplesheet(dir_in=dir_in)
     n_condition = length(unique(samplesheet$Condition)) # Get the number of conditions from samplesheet
@@ -176,9 +176,9 @@ get_para_sta <- function(tidydata)
 {
   para_sta <- tidy_fit(tidydata = tidydata) %>% summary()
   # return medians
-  data.frame(mixing.Sup = para_sta$summary["mixing_sup", 
+  data.frame(scaling.factor.Sup = para_sta$summary["scaling_factor_sup", 
                                                 "50%"], 
-             mixing.P100 = para_sta$summary["mixing_p100",
+             scaling.factor.Pellet = para_sta$summary["scaling_factor_pellet",
                                                  "50%"], 
              lp.n_eff = para_sta$summary["lp__", 
                                               "n_eff"], 
