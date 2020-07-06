@@ -129,17 +129,10 @@ each_mRNA_pSup <- function(data)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+# The last function to save history automatically
+.Last <- function() {
+  history.name <- paste(paste("AutoSave", Sys.Date(), strsplit(date(), " ")[[1]][4], sep="-"), ".Rhistory", sep="")
+  savehistory(paste(getwd(), history.name))
+}
 
 
