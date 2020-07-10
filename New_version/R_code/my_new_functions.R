@@ -36,17 +36,16 @@ read_count_files <- function(dir_in, file)
 {
   count_data = read_samplesheet(dir_in,file) %>%
     dplyr::group_by_all() %>%
-    do(read_tsv(here::here(dir_in, .$File[1]),col_names = c("ORF", 
-                                                          "Count")))
-}
+    do(read_tsv(here::here(dir_in, .$File[1]),col_names = c("ORF", "Count")))
+} # specify the classes
 
 
-# Get tidy data
 # Change the data format
+# Covert the long Fraction coloum to the wide format
 # There are two arguments, 
 # dir_in: the input directory & file: Samplesheet file name
 # This function is dependent on function read_count_files & read_samplesheet
-get_tidy_data <- function(dir_in, file)
+get_wide_Fraction <- function(dir_in, file)
 {
   data <- read_count_files(dir_in, file) %>%
     ungroup() %>%
@@ -133,5 +132,6 @@ each_mRNA_pSup <- function(tidydata)
   history.name <- paste(paste("AutoSave", Sys.Date(), strsplit(date(), " ")[[1]][4], sep="-"), ".Rhistory", sep="")
   savehistory(paste(getwd(), history.name))
 }
+
 
 
