@@ -1,15 +1,21 @@
 ---
-title: "new_draft_code"
+title: "draft_new_version"
+author: "Edward's lab - MSc Xuejia KE"
+date: "5th July 2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE, tidy=TRUE}
+library('knitr')
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
+# Process Data
 ```{r prepare_simulated_data, warning=FALSE, message=FALSE, echo=FALSE}
-source(here::here("new_simulate_data.R"))
+# Load all the functions
+# source(here::here("my_new_functions.R"))
+if(exists("myFirstFun", mode = "function"))
+    source("MyUtils.R")
 # And download the prepared samplesheet file from the Github repository
 ```
 
@@ -22,55 +28,128 @@ source(here::here("my_new_functions.R"))
 .First()
 ```
 
-
+## Read samplesheet
 ```{r load_samplesheet, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
-load_samplesheet <- read_samplesheet("new_simulated_data_in","Samplesheet")
-load_samplesheet
+load_samplesheet <- read_samplesheet("simulated_data_in","Samplesheet")
+pander::pander(load_samplesheet)
 ```
 
-
+## Read mRNA count files
 ```{r read_count_files, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
 # Read all the count files from the input directory
-get_count <- read_count_files("new_simulated_data_in")
-head(get_count)
+get_count <- read_count_files("simulated_data_in","Samplesheet")
+pander::pander(head(get_count))
 ```
 
 
-
-```{r get_tidydata, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+## Tidy data
+```{r get_wide_Fraction, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
 # Filter data using the ORF list generated above to get tidy data
-tidydata <- get_tidy_data(get_count)
-head(tidydata)
+wide_data <- get_wide_Fraction("simulated_data_in","Samplesheet")
+
+pander::pander(head(wide_data))
 ```
 
-
+# Model fitting & get mean of the parameters
 ```{r model_fitting, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
 # Compile model, code is saved in file model.stan
 # This can also be saved as pre_loaded data in the package
 compile_model <- stan_model(here::here("model.stan"))
-tidy_fit(tidydata)
+tidy_fit(wide_data)
 ```
 
-
+## Get median of the parameters
 ```{r get_paras_means, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
 # Get the median of each estimated parameter for each condition
 # Tot = scaling.factor.Sup * Sup + scaling.factor.Pellet * Pellet
 # Generate a data frame
-paras_mean <- paras_mean(tidydata)
+p_mean <- paras_mean(wide_data)
+pander::pander(p_mean)
 ```
 
-
+# Output
+## Calculate pSup
 ```{r calculate_pSup, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
 # pSup indicates the proportion of the mRNA in supernatant
 # Calculate pSup
-data_pSup <- calculate_pSup(tidydata)
+data_pSup <- calculate_pSup(wide_data)
+pander::pander(head(data_pSup))
+```
+
+---
+title: "draft_new_version"
+author: "Edward's lab - MSc Xuejia KE"
+date: "5th July 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE, tidy=TRUE}
+library('knitr')
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Process Data
+```{r prepare_simulated_data, warning=FALSE, message=FALSE, echo=FALSE}
+# Load all the functions
+# source(here::here("my_new_functions.R"))
+if(exists("myFirstFun", mode = "function"))
+    source("MyUtils.R")
+# And download the prepared samplesheet file from the Github repository
 ```
 
 
-```{r show_each_mRNA_pSup, dependson = c("calculate_pSup","load_samplesheet")}
-###### to the results
-# Generate a wider data frame
-# Each gene's pSup under each condition is clearly represented
-mRNA_pSup <- each_mRNA_pSup(data_pSup)
+```{r load_functions&packages, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+# Load all the functions
+source(here::here("my_new_functions.R"))
+
+# call the starter function to load all the packages
+.First()
 ```
 
+## Read samplesheet
+```{r load_samplesheet, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+load_samplesheet <- read_samplesheet("simulated_data_in","Samplesheet")
+pander::pander(load_samplesheet)
+```
+
+## Read mRNA count files
+```{r read_count_files, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Read all the count files from the input directory
+get_count <- read_count_files("simulated_data_in","Samplesheet")
+pander::pander(head(get_count))
+```
+
+
+## Tidy data
+```{r get_wide_Fraction, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Filter data using the ORF list generated above to get tidy data
+wide_data <- get_wide_Fraction("simulated_data_in","Samplesheet")
+
+pander::pander(head(wide_data))
+```
+
+# Model fitting & get mean of the parameters
+```{r model_fitting, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Compile model, code is saved in file model.stan
+# This can also be saved as pre_loaded data in the package
+compile_model <- stan_model(here::here("model.stan"))
+tidy_fit(wide_data)
+```
+
+## Get median of the parameters
+```{r get_paras_means, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# Get the median of each estimated parameter for each condition
+# Tot = scaling.factor.Sup * Sup + scaling.factor.Pellet * Pellet
+# Generate a data frame
+p_mean <- paras_mean(wide_data)
+pander::pander(p_mean)
+```
+
+# Output
+## Calculate pSup
+```{r calculate_pSup, include=FALSE, warning=TRUE, message=TRUE, echo=TRUE}
+# pSup indicates the proportion of the mRNA in supernatant
+# Calculate pSup
+data_pSup <- calculate_pSup(wide_data)
+pander::pander(head(data_pSup))
+```
