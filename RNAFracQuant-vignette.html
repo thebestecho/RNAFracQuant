@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Edward Wallace" />
+<meta name="author" content="Xuejia Ke" />
+
+
+<title>Introduction to package RNAFracQuant</title>
+
+<script src="RNAFracQuant-vignette_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="RNAFracQuant-vignette_files/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="RNAFracQuant-vignette_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="RNAFracQuant-vignette_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="RNAFracQuant-vignette_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="RNAFracQuant-vignette_files/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Introduction to package RNAFracQuant</h1>
+<h4 class="author">Edward Wallace<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></h4>
+<h4 class="author">Xuejia Ke<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></h4>
+<h4 class="date">July 2020</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">1. Introduction</a><ul>
+<li><a href="#required-input-files-and-their-format">1.1 Required input files and their format</a></li>
+<li><a href="#example-data">1.2 Example data</a><ul>
+<li><a href="#simulate-count-values">1.2.1 Simulate count values</a></li>
+<li><a href="#write-those-values-into-text-files">1.2.2 Write those values into text files</a></li>
+<li><a href="#repeat-for-the-second-replicate">1.2.3 Repeat for the second replicate</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#functions-in-this-package">2. Functions in this package</a><ul>
+<li><a href="#reading-one-or-more-text-files">2.1 Reading one or more text files</a></li>
+<li><a href="#fit-the-bayesian-stan-model">2.2 Fit the bayesian stan model</a></li>
+<li><a href="#calculate-psup-for-each-transcript">2.3 Calculate pSup for each transcript</a></li>
+<li><a href="#write-results-in-a-single-directory">2.4 Write results in a single directory</a></li>
+<li><a href="#summary">2.5 Summary</a></li>
+</ul></li>
+<li><a href="#model-evaluation-on-simulated-data">3. Model evaluation on simulated data</a></li>
+<li><a href="#extra-info">4. EXTRA INFO</a><ul>
+<li><a href="#issues-update">4.1 Issues update</a></li>
+<li><a href="#installation-library-guide">4.2 Installation &amp; library guide</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1">
+<h1>1. Introduction</h1>
+<p>This vignette introduces how to use the functions in this packge. This package employs a bayesian statistical model to quantify the distribution of mRNA in Saccharomyces Cerevisiae cells. The whole idea is based on this heat shock experiment:</p>
+<p><em>“To prepare RNA-seq data, cells are fractionated before cloning the resulting RNA into cDNA libraries. Then after centrifugation, granules with large molecular weight would deposit at the bottom and the others remain in the supernatant. Total transcripts and transcripts in the two factions (Supernatant, Pellet) are measured respectively both before and after heat shock. Therefore, for each transcript, we have a basic formula <span class="math inline">\(N_{total} = N_{pellet} + N_{supernatant}\)</span>.”</em></p>
+<p><img src="/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RNAFracQuant/help/figures/Experiment_design.png" width="100%" /> [Experiment example design]</p>
+<hr />
+<div id="required-input-files-and-their-format" class="section level2">
+<h2>1.1 Required input files and their format</h2>
+<p>Users need to provide count files and a samplesheet file. Those files need to meet the conditions below:</p>
+<p><strong><span style="color:red;">1.</span> Both count files and samplesheet file need to be in the “.txt” format</strong><br />
+<strong><span style="color:red;">2.</span> In count files, there should be only two columns (name of the transcripts and their respective count values);</strong> <strong><span style="color:red;">3.</span> In samplesheet file, there should be at least three columns “Condition”, “Fraction” and “File”</strong><br />
+<strong><span style="color:red;">4.</span> For every line of comment, there should be a tag “#” at the begining of the text</strong><br />
+<strong><span style="color:red;">5.</span> All the count files and the samplesheet file should be put in the same directory</strong></p>
+<p>Functions in this package are linked to each other. We aim to output the proportion value for each transcript in supernatant (pSup value) at the final step. Before you use this package, we strongly recommand you to check your experimental design and think about what results you expect to get.</p>
+<hr />
+</div>
+<div id="example-data" class="section level2">
+<h2>1.2 Example data</h2>
+<p>This vignette builds from a simulated dataset with two replicates, two fractions and six sample count files. For each count file, there are twenty transctipts, named from G1 to G20. Count values for Total, Pellet, Supernatant and pSup values for transcripts are simulated as below:</p>
+<p><span class="math inline">\(pSup: \mathcal{U}(min=0,max=1)\)</span><br />
+<span class="math inline">\(scaling.factor.Pellet: \mathcal{U}(min=0,max=1)\)</span><br />
+<span class="math inline">\(scaling.factor.Sup: \mathcal{U}(min=0,max=1)\)</span><br />
+<span class="math inline">\(N_{total}: X\sim\mathcal{N}(\mu,\,\sigma^{2})\)</span><br />
+<span class="math inline">\(N_{pellet}: P\left( x \right) = \frac{{e^{ - \lambda } \lambda ^x }}{{x!}}\)</span>, <span class="math inline">\(\lambda=N_{total} \times scaling.factor.Pellet \times pSup\)</span><br />
+<span class="math inline">\(N_{supernatant}: P\left( x \right) = \frac{{e^{ - \lambda } \lambda ^x }}{{x!}}\)</span>, <span class="math inline">\(\lambda=N_{total} \times scaling.factor.Sup \times (1-pSup)\)</span></p>
+<p>This <strong>RNAFracQuant</strong> package comes with a data directory called <code>extdata</code> that contains all the example files. In this vigenette, we will use this data directory. When reading in custom files, you will need to determine your own data directory. See <code>?getwd()</code> and <code>?setwd()</code> for more information.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Samplesheet file format example</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;Samplesheet&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;RNAFracQuant&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># Count file format example</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;sample1.txt&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;RNAFracQuant&quot;</span>)</span></code></pre></div>
+<p>If you are interested in how those data are generated, you may find the following contents helpful.</p>
+<hr />
+<div id="simulate-count-values" class="section level3">
+<h3>1.2.1 Simulate count values</h3>
+<p>We assume there are two experiment conditions, 30C and 42C. Here we use function <code>dir.create</code> to create a filder to store those simulated data. Function <a href="https://www.rdocumentation.org/packages/here/versions/0.1">here::here</a> helps to construct paths to your project’s files. We use function <code>data.frame</code> to get a two-column data frame that contains the transcript names (ORF) and their respective RNA-seq count values. Function <code>set.seed</code> used here is to make sure the dataset is reproducible.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">dir.create</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;simulated_data&quot;</span>))</span>
+<span id="cb2-2"><a href="#cb2-2"></a>ORF &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;G&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">set.seed</span>(<span class="dv">5</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>Tot1 &lt;-<span class="st"> </span><span class="kw">floor</span>(<span class="kw">rlnorm</span>(<span class="dv">20</span>, <span class="kw">log</span>(<span class="dv">8000</span>), <span class="kw">log</span>(<span class="fl">1.5</span>)))</span>
+<span id="cb2-5"><a href="#cb2-5"></a>pSup1 &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">20</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>) <span class="co"># pSup for condition 30C</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>scaling_factor1S &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>) <span class="co"># scaling factor for Sup in condition 30C</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>scaling_factor1P &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>) <span class="co"># scaling factor for Pellet in condition 30C</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>Sup1 &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">20</span>, <span class="dt">lambda =</span> Tot1<span class="op">*</span>scaling_factor1S<span class="op">*</span>pSup1)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>Pellet1 &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">20</span>, <span class="dt">lambda =</span> Tot1<span class="op">*</span>scaling_factor1P<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>pSup1))</span>
+<span id="cb2-10"><a href="#cb2-10"></a>sample1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ORF, Tot1)</span></code></pre></div>
+<hr />
+</div>
+<div id="write-those-values-into-text-files" class="section level3">
+<h3>1.2.2 Write those values into text files</h3>
+<p>Here we use function <code>write_tsv</code> to write those generated data frames into text files and also put them in the same directory. You can specify the directory as well as the file name as you prefer. See <code>?write_tsv()</code> for more information.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">write_tsv</span>(sample1,</span>
+<span id="cb3-2"><a href="#cb3-2"></a>          here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;simulated_data&quot;</span>,<span class="st">&quot;sample1.txt&quot;</span>),<span class="dt">col_names =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>sample2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ORF, Sup1)</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">write_tsv</span>(sample2,</span>
+<span id="cb3-5"><a href="#cb3-5"></a>          here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;simulated_data&quot;</span>,<span class="st">&quot;sample2.txt&quot;</span>),<span class="dt">col_names =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>sample3 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ORF, Pellet1)</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="kw">write_tsv</span>(sample3,</span>
+<span id="cb3-8"><a href="#cb3-8"></a>          here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;simulated_data&quot;</span>,<span class="st">&quot;sample3.txt&quot;</span>),<span class="dt">col_names =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<hr />
+</div>
+<div id="repeat-for-the-second-replicate" class="section level3">
+<h3>1.2.3 Repeat for the second replicate</h3>
+<p>The whole process illustrated above is repeated to get the second replicate (condition).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>Tot2 &lt;-<span class="st"> </span><span class="kw">floor</span>(<span class="kw">rlnorm</span>(<span class="dv">20</span>, <span class="kw">log</span>(<span class="dv">5000</span>), <span class="kw">log</span>(<span class="fl">1.5</span>)))</span>
+<span id="cb4-3"><a href="#cb4-3"></a>pSup2 &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">20</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>) <span class="co">#pSup for condition 42C</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>scaling_factor2S &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>) <span class="co">#scaling factor for Sup in condition 42C</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>scaling_factor2P &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>) <span class="co">#scaling factor for Pellet in condition 42C</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>Sup2 &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">20</span>, <span class="dt">lambda =</span> Tot2<span class="op">*</span>scaling_factor2S<span class="op">*</span>pSup2)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>Pellet2 &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">20</span>, <span class="dt">lambda =</span> Tot2<span class="op">*</span>scaling_factor2P<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>pSup2))</span>
+<span id="cb4-8"><a href="#cb4-8"></a>sample4 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ORF, Tot2)</span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="kw">write_tsv</span>(sample4,</span>
+<span id="cb4-10"><a href="#cb4-10"></a>          here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;simulated_data&quot;</span>,<span class="st">&quot;sample4.txt&quot;</span>),<span class="dt">col_names =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb4-11"><a href="#cb4-11"></a>sample5 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ORF, Sup2)</span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="kw">write_tsv</span>(sample5,</span>
+<span id="cb4-13"><a href="#cb4-13"></a>          here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;simulated_data&quot;</span>,<span class="st">&quot;sample5.txt&quot;</span>),<span class="dt">col_names =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb4-14"><a href="#cb4-14"></a>sample6 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ORF, Pellet2)</span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="kw">write_tsv</span>(sample6,</span>
+<span id="cb4-16"><a href="#cb4-16"></a>          here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;simulated_data&quot;</span>,<span class="st">&quot;sample6.txt&quot;</span>),<span class="dt">col_names =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<hr />
+</div>
+</div>
+</div>
+<div id="functions-in-this-package" class="section level1">
+<h1>2. Functions in this package</h1>
+<p>There are several functions in this package. Some of them are responsible for reading files, the others are working for data manipulation and model fitting. There is also a function that you can choose to write the results as text files in a single directory. For different functions, you need to input different arguments. If you are not familiar with functions in r, you can refer to <a href="http://adv-r.had.co.nz/Functions.html#function-arguments">Function arguments</a> written by Hadley Wickham for more information.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>DATA_DIR &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata/&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;RNAFracQuant&quot;</span>)</span></code></pre></div>
+<hr />
+<div id="reading-one-or-more-text-files" class="section level2">
+<h2>2.1 Reading one or more text files</h2>
+<p>Here function <strong>read_samplesheet</strong> from this package <strong>RNAFracQuant</strong> reads the samplesheet file and outputs a single data frame. You can specify the name of the samplesheet file and the directory that contains the file by <code>read_samplesheet(dir_in = "my_folder", file = "my_file"</code> or just <code>read_samplesheet("my_folder", "my_file")</code>. Those two input arguments are the same in functions <strong>read_samplesheet</strong>, <strong>load_samplesheet</strong> and <strong>get_wide_Fraction</strong> of <strong>RNAFracQuant</strong>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>load_samplesheet &lt;-<span class="st"> </span><span class="kw">read_samplesheet</span>(<span class="dt">dir_in =</span> DATA_DIR, <span class="dt">file =</span> <span class="st">&quot;Samplesheet&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>knitr<span class="op">::</span><span class="kw">kable</span>(load_samplesheet, <span class="dt">align=</span><span class="st">&quot;c&quot;</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Condition</th>
+<th align="center">Fraction</th>
+<th align="center">File</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">Tot</td>
+<td align="center">sample1.txt</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">Sup</td>
+<td align="center">sample2.txt</td>
+</tr>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">Pellet</td>
+<td align="center">sample3.txt</td>
+</tr>
+<tr class="even">
+<td align="center">42C</td>
+<td align="center">Tot</td>
+<td align="center">sample4.txt</td>
+</tr>
+<tr class="odd">
+<td align="center">42C</td>
+<td align="center">Sup</td>
+<td align="center">sample5.txt</td>
+</tr>
+<tr class="even">
+<td align="center">42C</td>
+<td align="center">Pellet</td>
+<td align="center">sample6.txt</td>
+</tr>
+</tbody>
+</table>
+<p>To read all the count files, function <strong>read_samplesheet</strong> is called within function <strong>read_count_files</strong>. Function <strong>read_count_files</strong> reads files listed in samplesheet “File” column and then output them in a single data frame.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>get_count &lt;-<span class="st"> </span><span class="kw">read_count_files</span>(<span class="dt">dir_in =</span> DATA_DIR, <span class="dt">file =</span> <span class="st">&quot;Samplesheet&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(get_count), <span class="dt">align=</span><span class="st">&quot;c&quot;</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Condition</th>
+<th align="center">Fraction</th>
+<th align="center">File</th>
+<th align="center">ORF</th>
+<th align="center">Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">Pellet</td>
+<td align="center">sample3.txt</td>
+<td align="center">G1</td>
+<td align="center">191</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">Pellet</td>
+<td align="center">sample3.txt</td>
+<td align="center">G2</td>
+<td align="center">1858</td>
+</tr>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">Pellet</td>
+<td align="center">sample3.txt</td>
+<td align="center">G3</td>
+<td align="center">129</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">Pellet</td>
+<td align="center">sample3.txt</td>
+<td align="center">G4</td>
+<td align="center">637</td>
+</tr>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">Pellet</td>
+<td align="center">sample3.txt</td>
+<td align="center">G5</td>
+<td align="center">213</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">Pellet</td>
+<td align="center">sample3.txt</td>
+<td align="center">G6</td>
+<td align="center">451</td>
+</tr>
+</tbody>
+</table>
+<p>As we are interested in the count values of transcripts in different fractions, function <strong>get_wide_Fraction</strong> is neccessary for coverting data into a wide format. The output of this function would be used as the input data in the next functions. Data <code>wide_data</code> is pre_loaded in <strong>RNAFracQuant</strong>, you can obtain it by <code>data("wide_data")</code> after installing this package.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Filter data using the ORF list generated above to get tidy data</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>wide_data &lt;-<span class="st"> </span><span class="kw">get_wide_Fraction</span>(DATA_DIR,<span class="st">&quot;Samplesheet&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(wide_data), <span class="dt">align=</span><span class="st">&quot;c&quot;</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Condition</th>
+<th align="center">ORF</th>
+<th align="center">Pellet</th>
+<th align="center">Sup</th>
+<th align="center">Tot</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">G1</td>
+<td align="center">191</td>
+<td align="center">2956</td>
+<td align="center">5688</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">G2</td>
+<td align="center">1858</td>
+<td align="center">2158</td>
+<td align="center">14023</td>
+</tr>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">G3</td>
+<td align="center">129</td>
+<td align="center">2541</td>
+<td align="center">4808</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">G4</td>
+<td align="center">637</td>
+<td align="center">2816</td>
+<td align="center">8230</td>
+</tr>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">G5</td>
+<td align="center">213</td>
+<td align="center">9372</td>
+<td align="center">16012</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">G6</td>
+<td align="center">451</td>
+<td align="center">2102</td>
+<td align="center">6265</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="fit-the-bayesian-stan-model" class="section level2">
+<h2>2.2 Fit the bayesian stan model</h2>
+<p>As described below, the bayesian statistical model is based on the fomula below:</p>
+<p><span style="font-size:20px;"><span class="math inline">\(Tot=scaling.factor.Sup \times Sup + scaling.factor.Pellet \times Pellet\)</span></span></p>
+<p>We aim to estimate the scalling factors (scaling.factor.Sup and scaling.factor.Pellet) to rescale the count values for supernatant and pellet.</p>
+<p>Instead of including the stan code in the functions for computing, the compiled stan model is loaded in this package as data <strong>compile_model</strong> using function <code>rstan::stan_model</code>. Data <strong>compile_model</strong> can be computed directory to draw samples, allowing inference to be performed for the model and wide_data. Thus, there is less time consumed for model fitting. See <a href="https://mc-stan.org/rstan/reference/stan_model.html">rstan::stan_model</a> for more information.</p>
+<hr />
+<p>In function <strong>model_fit</strong>, the number of chains in sampling is default to 4, the number of iteration is default to 1000 and the control is default to “list(adapt_delta = 0.85)”. You can specify those values as you prefer. For example, <code>model_fit(wide_data = mydata, chains = 3, iter = 1500, control = list(adapt_delta = 0.85))</code>. You can also input other arguments in <strong>model_fit</strong>, for example, <code>model_fit(wide_data = mydata, cores = getOption("mc.cores", 1L))</code>. See <a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html">rstan::sampling</a> or type <code>?rstan::sampling</code> for more info. If you are interested in the stan model evaluation, you can view this bayesian statistical model graphical diagnosis by <code>shinystan::launch_shinystan(model_fit(wide_data))</code>. See <a href="https://www.rdocumentation.org/packages/rstanarm/versions/2.15.3/topics/shinystan">launch_shinystan</a> or type <code>?shinystan::launch_shinystan</code> in Rstudio for more info.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">model_fit</span>(wide_data)</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co"># Inference for Stan model: model.</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co"># 4 chains, each with iter=1000; warmup=500; thin=1; </span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co"># post-warmup draws per chain=500, total post-warmup draws=2000.</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#                           mean se_mean   sd       2.5%        25%        50%        75%      97.5%</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co"># scaling_factor_sup          1.89    0.01 0.53       1.06       1.51       1.82       2.20       3.14</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co"># scaling_factor_pellet      11.99    0.04 1.45       9.30      11.00      11.94      12.92      15.06</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co"># phi                         2.62    0.02 0.57       1.59       2.21       2.60       2.99       3.81</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co"># lp__                  2005892.15    0.04 1.18 2005889.10 2005891.58 2005892.46 2005893.02 2005893.52</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co">#                       n_eff Rhat</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co"># scaling_factor_sup     1369    1</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="co"># scaling_factor_pellet  1482    1</span></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co"># phi                    1261    1</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="co"># lp__                    978    1</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a></span>
+<span id="cb12-17"><a href="#cb12-17"></a><span class="co"># Samples were drawn using NUTS(diag_e) at Tue Jul 21 03:10:53 2020.</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a><span class="co"># For each parameter, n_eff is a crude measure of effective sample size,</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="co"># and Rhat is the potential scale reduction factor on split chains (at </span></span>
+<span id="cb12-20"><a href="#cb12-20"></a><span class="co"># convergence, Rhat=1).</span></span></code></pre></div>
+<p>Get the estimated medians of parameters for each condition and output them in a single data frame. Similar to function <strong>model_fit</strong>, you can specify the values of “chains”, “iteration” and “control” as you prefer. For example, <code>get_paras_median(wide_data = mydata, chains = 3, iter = 1500, control = list(adapt_delta = 0.85))</code>. You can also input other arguments in <strong>get_paras_median</strong>, for example, <code>get_paras_median(wide_data = mydata, cores = getOption("mc.cores", 1L))</code>.<br />
+See <code>?rstan::sampling</code> in Rstudio for more information.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Get the median of each estimated parameter for each condition</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="co"># Output a data frame</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a>paras_median &lt;-<span class="st"> </span><span class="kw">get_paras_median</span>(wide_data)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>knitr<span class="op">::</span><span class="kw">kable</span>(paras_median, <span class="dt">align=</span><span class="st">&quot;c&quot;</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Condition</th>
+<th align="center">scaling.factor.Sup</th>
+<th align="center">scaling.factor.Pellet</th>
+<th align="center">lp.n_eff</th>
+<th align="center">lp.Rhat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">1.593168</td>
+<td align="center">5.857290</td>
+<td align="center">262.8608</td>
+<td align="center">1.009136</td>
+</tr>
+<tr class="even">
+<td align="center">42C</td>
+<td align="center">31.251365</td>
+<td align="center">8.588912</td>
+<td align="center">547.4870</td>
+<td align="center">1.003092</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="calculate-psup-for-each-transcript" class="section level2">
+<h2>2.3 Calculate pSup for each transcript</h2>
+<p>pSup stands for the values of the proportion of transcripts in the supernatant. It can be inferred that the proportion of transcripts in the pellet is <span class="math inline">\(1-pSup\)</span>.</p>
+<p><span style="font-size:25px;"><span class="math inline">\(pSup = \frac{{scaling.factor.Sup \times Sup}}{{scaling.factor.Sup \times Sup + scaling.factor.Pellet \times Pellet}}\)</span></span></p>
+<hr />
+<p>Here function <strong>calculate_pSup</strong> takes the wide format data in terms of fractions and output a data frame that includes a variable pSup calculated for each transcript. You can specify the values of “chains”, “iteration” and “control” as you prefer as the input arguments in this function. For example, <code>calculate_pSup(wide_data = mydata, chains = 3, iter = 1500, control = list(adapt_delta = 0.85))</code>. You can also input other arguments in <strong>calculate_pSup</strong>, for example, <code>calculate_pSup(wide_data = mydata, cores = getOption("mc.cores", 1L))</code>.<br />
+Type <code>?rstan::sampling</code> in Rstudio for more information.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>data_pSup &lt;-<span class="st"> </span><span class="kw">calculate_pSup</span>(wide_data)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(data_pSup), <span class="dt">align=</span><span class="st">&quot;c&quot;</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Condition</th>
+<th align="center">ORF</th>
+<th align="center">Pellet</th>
+<th align="center">Sup</th>
+<th align="center">Tot</th>
+<th align="center">scaling.factor.Sup</th>
+<th align="center">scaling.factor.Pellet</th>
+<th align="center">pSup</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">G1</td>
+<td align="center">191</td>
+<td align="center">2956</td>
+<td align="center">5688</td>
+<td align="center">1.593411</td>
+<td align="center">5.855035</td>
+<td align="center">0.8081283</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">G2</td>
+<td align="center">1858</td>
+<td align="center">2158</td>
+<td align="center">14023</td>
+<td align="center">1.593411</td>
+<td align="center">5.855035</td>
+<td align="center">0.2401707</td>
+</tr>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">G3</td>
+<td align="center">129</td>
+<td align="center">2541</td>
+<td align="center">4808</td>
+<td align="center">1.593411</td>
+<td align="center">5.855035</td>
+<td align="center">0.8427821</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">G4</td>
+<td align="center">637</td>
+<td align="center">2816</td>
+<td align="center">8230</td>
+<td align="center">1.593411</td>
+<td align="center">5.855035</td>
+<td align="center">0.5460883</td>
+</tr>
+<tr class="odd">
+<td align="center">30C</td>
+<td align="center">G5</td>
+<td align="center">213</td>
+<td align="center">9372</td>
+<td align="center">16012</td>
+<td align="center">1.593411</td>
+<td align="center">5.855035</td>
+<td align="center">0.9229247</td>
+</tr>
+<tr class="even">
+<td align="center">30C</td>
+<td align="center">G6</td>
+<td align="center">451</td>
+<td align="center">2102</td>
+<td align="center">6265</td>
+<td align="center">1.593411</td>
+<td align="center">5.855035</td>
+<td align="center">0.5591596</td>
+</tr>
+</tbody>
+</table>
+<p>Clear format to represent the proportion of each transcript in the Supernatant. Similar to function <strong>model_fit</strong>, you can also specify the values of “chains”, “iteration” and “control” as you prefer. For example, <code>each_mRNA_pSup(wide_data = mydata, chains = 3, iter = 1500, control = list(adapt_delta = 0.85))</code>. You can also input other arguments in <strong>each_mRNA_pSup</strong>, for example, <code>each_mRNA_pSup(wide_data = mydata, cores = getOption("mc.cores", 1L))</code>.<br />
+Type <code>?rstan::sampling</code> in Rstudio for more information.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>mRNA_pSup &lt;-<span class="st"> </span><span class="kw">each_mRNA_pSup</span>(wide_data)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Generate a wider data frame</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co"># Each gene&#39;s pSup under each condition is clearly represented</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(mRNA_pSup), <span class="dt">align=</span><span class="st">&quot;c&quot;</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">ORF</th>
+<th align="center">30C</th>
+<th align="center">42C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">G1</td>
+<td align="center">0.8080961</td>
+<td align="center">0.2531997</td>
+</tr>
+<tr class="even">
+<td align="center">G2</td>
+<td align="center">0.2401329</td>
+<td align="center">0.2528007</td>
+</tr>
+<tr class="odd">
+<td align="center">G3</td>
+<td align="center">0.8427546</td>
+<td align="center">0.0106709</td>
+</tr>
+<tr class="even">
+<td align="center">G4</td>
+<td align="center">0.5460369</td>
+<td align="center">0.7445370</td>
+</tr>
+<tr class="odd">
+<td align="center">G5</td>
+<td align="center">0.9229099</td>
+<td align="center">0.2165076</td>
+</tr>
+<tr class="even">
+<td align="center">G6</td>
+<td align="center">0.5591085</td>
+<td align="center">0.1668058</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="write-results-in-a-single-directory" class="section level2">
+<h2>2.4 Write results in a single directory</h2>
+<p>Function <strong>write_results</strong> takes the outputs of functions in RNAFracQuant as the input arguments and then writes them into text files under the same “Results” directory. You can input unlimited number of arguments in this function, for example, <code>write_results(data1, data2, data3, ..., data_n)</code>. However, all the arguments should be data frames or tibbles, which can be written into files by <code>readr::write_tsv</code>.<br />
+See <a href="https://readr.tidyverse.org/reference/write_delim.html">write_tsv</a> or type <code>?readr::write_tsv</code> in Rstudio for more info.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>write_results &lt;-<span class="st"> </span><span class="cf">function</span>(data_pSup,paras_median,wide_data)</span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="co"># list.files(&quot;Results&quot;)</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a><span class="co"># [1] &quot;data_pSup.txt&quot;    &quot;paras_median.txt&quot; &quot;wide_data.txt&quot; </span></span></code></pre></div>
+<hr />
+</div>
+<div id="summary" class="section level2">
+<h2>2.5 Summary</h2>
+<p>If you only want to get the pSup values for transcripts, the code below shows you the quickest way to get them.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>mydata &lt;-<span class="st"> </span><span class="kw">get_wide_Fraction</span>(<span class="dt">dir_in =</span> mydirectory, <span class="dt">file =</span> myfile)</span>
+<span id="cb20-2"><a href="#cb20-2"></a>result_data &lt;-<span class="st"> </span><span class="kw">each_mRNA_pSup</span>(<span class="dt">wide_data =</span> mydatda)</span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="kw">write_results</span>(result_data)</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="model-evaluation-on-simulated-data" class="section level1">
+<h1>3. Model evaluation on simulated data</h1>
+<p>To identify whether our statistical model is reliable, we plotted the calculated pSup versus the actual pSup values. We can see that the distributions of inferred and actual pSup values do perfectly match each other. Therefore, we are confident to say that our model is reliable statistically.</p>
+<p><img src="/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RNAFracQuant/help/figures/Actual-vs-Inferred_pSup.png" width="100%" /> [Model Evaluation Plot]</p>
+<hr />
+</div>
+<div id="extra-info" class="section level1">
+<h1>4. EXTRA INFO</h1>
+<div id="issues-update" class="section level2">
+<h2>4.1 Issues update</h2>
+<p>If you get any problems with this package, you could update your questions <a href="https://github.com/thebestecho/demo-RNAFracQuant/issues">here</a>.</p>
+</div>
+<div id="installation-library-guide" class="section level2">
+<h2>4.2 Installation &amp; library guide</h2>
+<p>Please refer to <a href="https://github.com/thebestecho/demo_RNAFracQuant">this page</a> for more info.</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>University of Edinburgh, <a href="mailto:edward.wallace@ed.ac.uk" class="email">edward.wallace@ed.ac.uk</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>University of Edinburgh, <a href="mailto:x.ke-3@sms.ed.ac.uk" class="email">x.ke-3@sms.ed.ac.uk</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
