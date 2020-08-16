@@ -13,7 +13,7 @@ colnames(wide_published_data) [c (1,4:6)] <- c("ORF","Pellet","Sup","Tot")
 # Filter data
 ORFselect = readr::read_tsv("./original_Scer_ORF_length.txt")
 wide_published_filtered <- wide_published_data %>%
-  tidyr::unite(Condition,Condition,Replicate,sep = "_") %>%
+  unite(Condition,Condition,Replicate,sep = "_") %>%
   dplyr::filter(ORF %in% ORFselect$ORF, Pellet > 0, Sup > 0, Tot > 0)
 # Get pSup values
 published_data_pSup <- each_mRNA_pSup (wide_published_filtered)
