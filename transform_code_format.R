@@ -17,3 +17,16 @@ wide_published_filtered <- wide_published_data %>%
   dplyr::filter(ORF %in% ORFselect$ORF, Pellet > 0, Sup > 0, Tot > 0)
 # Get pSup values
 published_data_pSup <- each_mRNA_pSup (wide_published_filtered)
+
+# Read Sample sheet
+Samplesheet <- read_tsv("../Samplesheet.txt",comment="#")
+# Read sample files
+read_ORFCount <- function(file_ext,dir_in) {
+paste0(dir_in,"/",file_ext) %>% 
+read_tsv (col_names = c("ORF","Count"), comment="__")
+}
+# Read count files
+TSP_Count <- Samplesheet %>%
+  group_by (File,Sample,Condition,Fraction) %>%
+  do(read_ORFCount(file_ext=.$File[1],dir_in="../")) %>%
+    mutate (ORF=stringr::str_sub(ORF,end=-5))
