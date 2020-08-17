@@ -1,4 +1,5 @@
-# run stan mixing ratio inference, reusing same model
-mixing_ratios_TSP <- TSP_Count_FracBySample %>%
-    ddply(~Condition,getmixingratiosTSP,
-          stan_mixing=stan_mixingTSP_wd5,iter=1000,seed=myseed)
+TSP_Count_FracBySample_pSup <- 
+    TSP_Count_FracBySample %>%
+    left_join(select(mixing_ratios_TSP,Condition,mixing.Sup,mixing.P100)) %>%
+    mutate(mixSum=mixing.Sup*Sup+mixing.P100*P100,
+           pSup=mixing.Sup*Sup/mixSum)
