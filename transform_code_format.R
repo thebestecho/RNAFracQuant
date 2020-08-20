@@ -1,5 +1,7 @@
-TSP_Count_FracBySample_pSup <- 
-    TSP_Count_FracBySample %>%
-    left_join(select(mixing_ratios_TSP,Condition,mixing.Sup,mixing.P100)) %>%
-    mutate(mixSum=mixing.Sup*Sup+mixing.P100*P100,
-           pSup=mixing.Sup*Sup/mixSum)
+install.packages("devtools")
+library(devtools)
+install_github("thebestecho/demo-RNAFracQuant",build_vignettes = TRUE)
+
+# Then load RNAFracQuant as a standard package
+library (RNAFracQuant)
+
